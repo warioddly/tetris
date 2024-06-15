@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:math';
 
 import 'package:flutter/material.dart' hide Hero;
 import 'package:flutter/scheduler.dart';
@@ -41,10 +42,11 @@ class _MyHomePageState extends State<MyHomePage> {
   Shape? currentShape;
 
 
-  Duration interval = const Duration(milliseconds: 500);
+  Duration interval = const Duration(milliseconds: 300);
+  Duration lastUpdate = Duration.zero;
   Timer? timer;
 
-  Size size = const Size(0, 0);
+  static const Size size = Size(400, 500);
 
   final shapes = <Shape>[];
 
@@ -61,7 +63,6 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   Widget build(BuildContext context) {
-    size = MediaQuery.of(context).size;
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
@@ -72,8 +73,7 @@ class _MyHomePageState extends State<MyHomePage> {
         onKeyEvent: onKeyEvent,
         child: Stack(
           children: <Widget>[
-            BackgroundGrid(size: size),
-
+            const BackgroundGrid(size: size),
             Positioned(
               top: currentShape!.position.y.toDouble(),
               left: currentShape!.position.x.toDouble(),
@@ -145,11 +145,13 @@ class _MyHomePageState extends State<MyHomePage> {
 
   void ticker(timer) {
 
-    currentShape?.position.y += kTileSize.toInt();
 
-    if (currentShape!.position.y >= size.height) {
+    if (currentShape!.position.y >= size.height - (kTileSize * 2)) {
       currentShape = randomShape();
       shapes.add(currentShape!);
+    }
+    else {
+      currentShape?.position.y += kTileSize.toInt();
     }
 
     updateState();
